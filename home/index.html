@@ -1,0 +1,76 @@
+<!--
+ * @Descripttion: 
+ * @version: 
+ * @Author: RoyalKnight
+ * @Date: 2020-08-27 18:36:04
+ * @LastEditors: RoyalKnight
+ * @LastEditTime: 2020-08-28 14:52:50
+-->
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+    INDEX
+    <button onclick="POSTfun()">POST</button>
+    <button onclick="GETfun()">GET</button>
+    <input id='account'>
+    <input id='password'>
+    <button onclick="Login()">login</button>
+</body>
+<script>
+    function POSTfun() {
+        var url = '/button';
+        var data = { name: 'example' };
+
+        fetch(url, {
+            method: 'POST', // or 'PUT'
+            body: JSON.stringify(data), // data can be `string` or {object}!
+            headers: new Headers({
+                'Content-Type': 'application/json'
+            })
+        }).then(res => res.json())
+            .catch(error => console.error('Error:', error))
+            .then(response => console.dir(response));
+    }
+    function GETfun() {
+        var url = '/buttonget?name=knight';
+        var data = { name: 'example' };
+
+        fetch(url, {
+            method: 'GET', // or 'PUT'
+            headers: new Headers({
+                'Content-Type': 'application/json'
+            })
+        }).then(res => res.json())
+            .catch(error => console.error('Error:', error))
+            .then(response => console.dir(response));
+    }
+    function Login() {
+        var url = '/login';
+        var data = {
+            account: account,
+            password: 'admin'
+        };
+
+        fetch(url, {
+            method: 'POST', // or 'PUT'
+            body: JSON.stringify(data), // data can be `string` or {object}!
+            headers: new Headers({
+                'Content-Type': 'application/json'
+            })
+        }).then(res => res.json())
+            .catch(error => console.error('Error:', error))
+            .then(response => {
+                localStorage.setItem('myimToken', response.token)
+                window.location.href = '/test' + '?token=' + localStorage.getItem('myimToken')
+            });
+    }
+</script>
+
+</html>

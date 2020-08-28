@@ -1,0 +1,39 @@
+<!--
+ * @Descripttion: 
+ * @version: 
+ * @Author: RoyalKnight
+ * @Date: 2020-08-28 14:41:58
+ * @LastEditors: RoyalKnight
+ * @LastEditTime: 2020-08-28 14:42:07
+-->
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+    Chat
+    <button onclick="but()">he</button>
+</body>
+<script>
+    function but() {
+        var url = '/button';
+        var data = { name: 'example' };
+
+        fetch(url, {
+            method: 'POST', // or 'PUT'
+            body: JSON.stringify(data), // data can be `string` or {object}!
+            headers: new Headers({
+                'Content-Type': 'application/json'
+            })
+        }).then(res => res.json())
+            .catch(error => console.error('Error:', error))
+            .then(response => console.dir(response));
+    }
+</script>
+
+</html>
