@@ -4,7 +4,7 @@
  * @Author: RoyalKnight
  * @Date: 2020-08-27 22:15:35
  * @LastEditors: RoyalKnight
- * @LastEditTime: 2020-08-28 14:57:32
+ * @LastEditTime: 2020-08-28 19:16:19
  */
 var mysqlCon = require('./mysql');
 var route={
@@ -33,16 +33,8 @@ var route={
             return true;
         }
     },
-    eachBefore:function(afterSlash,par,next,errPage){
-        mysqlCon.ifHaveAuth(afterSlash,par.token).then(
-            (value)=>{
-                if(value){
-                    next();
-                }else{
-                    errPage()
-                }
-            }
-        );
+    eachBefore:function(next,errPage){
+        next();
         return true
     }
 }

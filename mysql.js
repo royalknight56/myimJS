@@ -4,7 +4,7 @@
  * @Author: RoyalKnight
  * @Date: 2020-08-28 08:59:50
  * @LastEditors: RoyalKnight
- * @LastEditTime: 2020-08-28 15:00:40
+ * @LastEditTime: 2020-08-28 23:32:25
  */
 var mysql = require('mysql');
 var authLevel = require('./authLevel');
@@ -41,9 +41,13 @@ sql = {
                     if (error) {
                         reject()
                     }
-                    if (results[0]) {
-                        if (results[0].password == password) {
-                            resolve(true)
+                    if (results) {
+                        if (results[0]) {
+                            if (results[0].password == password) {
+                                resolve(true)
+                            } else {
+                                resolve(false)
+                            }
                         } else {
                             resolve(false)
                         }
@@ -57,24 +61,24 @@ sql = {
     },
     setToken: function (account, token) {
         var addSql = 'UPDATE `nodechat`.`user` SET `token` = ? WHERE (`account` = ?);';
-        var addSql_Params = [token,account];
+        var addSql_Params = [token, account];
         connection.query(addSql, addSql_Params, function (error, results, fields) {
             if (error) {
 
             }
         });
     },
-    ifHaveAuth: function (afterSlash, token) {
+    ifHaveAuth: function (right, token, account) {
         return new Promise(
             (resolve, reject) => {
-                var addSql = 'SELECT auth FROM user WHERE token=?';
+                var addSql = 'SELECT auth,account FROM user WHERE token=?';
                 var addSql_Params = [token];
                 connection.query(addSql, addSql_Params, function (error, results, fields) {
                     if (error) {
                         reject()
                     }
                     if (results[0]) {
-                        if (authLevel[results[0].auth].includes(afterSlash)) {
+                        if (authLevel[results[0].auth].includes(right) && results[0].account == account) {
                             resolve(true)
                         } else {
                             resolve(false)
@@ -86,7 +90,121 @@ sql = {
                 });
             }
         )
-    }
+    },
+    getFriend: function (account) {
+        return new Promise(
+            (resolve, reject) => {
+                var addSql = `SELECT account,username,type FROM friend 
+                            JOIN user
+                            ON user.account = friend.beowned
+                            WHERE own=?`;
+                var addSql_Params = [account];
+                connection.query(addSql, addSql_Params, function (error, results, fields) {
+                    if (error) {
+                        reject()
+                    }
+                    if (results) {
+
+                        resolve(results)
+                    } else {
+                        resolve(false)
+                    }
+
+                });
+            }
+        )
+    },
+    getMessageWith: function (account, withWho) {
+        return new Promise(
+            (resolve, reject) => {
+                var addSql = `select * from message 
+                where own=? and 
+                ((message.from=? and message.to=?) 
+                or 
+                (message.from=? and message.to=?))`;
+                var addSql_Params = [account, account, withWho, withWho, account];
+                connection.query(addSql, addSql_Params, function (error, results, fields) {
+                    if (error) {
+                        reject()
+                    }
+                    if (results) {
+                        resolve(results)
+                    } else {
+                        resolve(false)
+                    }
+
+                });
+            }
+        )
+    },
+    addFriend: async function (account, withWho) {
+        return new Promise(
+            (resolve, reject) => {
+                var addSql = `
+                    SELECT * FROM user
+                    where account=?;`
+                    ;
+                var addSql_Params = [withWho];
+                connection.query(addSql, addSql_Params, function (error, results, fields) {
+                    if (error) {
+                        reject()
+                    }
+                    if (results[0]) {
+                        var addSql = `
+                            INSERT INTO friend (own, beowned) 
+                            VALUES (?, ?);`
+                            ;
+                        var addSql_Params = [account, withWho];
+                        connection.query(addSql, addSql_Params, function (error, results, fields) {
+                            if (error) {
+                                reject()
+                            }else{
+                                resolve(results)
+                            }
+                        });
+                    } else {
+                        reject(false)
+                    }
+
+                });
+            }
+        )
+    },
+    deleteFriend: async function (account, withWho) {
+        return new Promise(
+            (resolve, reject) => {
+                var addSql = `
+                    SELECT * FROM friend
+                    where own=? and beowned=?;`
+                    ;
+                var addSql_Params = [account,withWho];
+                connection.query(addSql, addSql_Params, function (error, results, fields) {
+                    if (error) {
+                        reject()
+                    }
+
+                    if (results[0]) {
+                        var addSql = `
+                        DELETE FROM friend
+                        WHERE (own = ?) and (beowned = ?);
+                        `
+                        ;
+                        var addSql_Params = [account, withWho];
+                        connection.query(addSql, addSql_Params, function (error, results, fields) {
+                            if (error) {
+                                reject()
+                            }else{
+                                resolve(results)
+                            }
+                        });
+                    } else {
+                        reject(false)
+                    }
+
+                });
+            }
+        )
+    },
 }
 
 module.exports = sql

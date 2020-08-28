@@ -4,7 +4,7 @@
  * @Author: RoyalKnight
  * @Date: 2020-08-27 18:11:03
  * @LastEditors: RoyalKnight
- * @LastEditTime: 2020-08-28 15:47:11
+ * @LastEditTime: 2020-08-28 22:24:58
  */
 var http = require('http');
 var fs = require("fs");
@@ -18,7 +18,8 @@ var iconPath = 'home/JS.png'
 var rootPath = 'home'
 
 http.createServer(function (request, response) {
-    
+    response.setHeader('Access-Control-Allow-Origin', '*');
+    response.setHeader('Access-Control-Allow-Headers', '*');
     var afterSlash = url.parse(request.url).pathname.slice(1);
     if (request.url == '/favicon.ico') {
         //图标请求
@@ -40,11 +41,6 @@ http.createServer(function (request, response) {
                 post = JSON.parse(post);
                 var path = url.parse(request.url).pathname;
                 var data = api[path.split('/')[1]].data(post,response);
-                // response.writeHead(200, {
-                //     'Content-Type': 'application/json',
-                // });
-                // response.write(data);
-                // response.end();
             });
 
         } else if (request.method == "GET") {
@@ -52,41 +48,13 @@ http.createServer(function (request, response) {
 
             var path = url.parse(request.url).pathname;
             var data = api[path.split('/')[1]].data(par,response);
-
-            // response.writeHead(200, {
-            //     'Content-Type': 'application/json',
-            // });
-            // response.write(data);
-            // response.end();
         }
 
 
     } else {
         //处理页面请求
-        function next(){
-            var path = route['/' + afterSlash].path
-            // console.log('打开资源:' + path);
-            fs.readFile(path, function (err, data) {
-                if (err) {//home中没有对应文件
-                    fs.readFile(rootPath + '/index.html', function (err, data) {
-                        if (err) {//没有home/index
-                            response.writeHead(200, { 'Content-Type': 'text/html' });
-                            response.end("sorry");
-                            return -1;
-                        }
-                        response.writeHead(200, { 'Content-Type': 'text/html' });
-                        response.end(data.toString());
-                    })
-                    return -1;
-                }
-                // console.log(data.toString());
-                response.writeHead(200, { 'Content-Type': 'text/html' });
-                // 发送响应数据
-                response.end(data.toString());
-            });
-        }
         function errParg(){
-            fs.readFile(rootPath + '/index.html', function (err, data) {
+            fs.readFile(rootPath + '/news.html', function (err, data) {
                 if (err) {//没有home/index
                     response.writeHead(200, { 'Content-Type': 'text/html' });
                     response.end("sorry");
@@ -96,13 +64,7 @@ http.createServer(function (request, response) {
                 response.end(data.toString());
             })
         }
-        var par = querystring.parse(url.parse(request.url).query)
-        if (route['/' + afterSlash]) {
-            route.eachBefore(afterSlash,par,next,errParg)
-        } else {
-            errParg();
-            return -1;
-        }
+        errParg();
     }
 
 }).listen(8080);

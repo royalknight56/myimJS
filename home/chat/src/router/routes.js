@@ -4,7 +4,7 @@
  * @Autor: RoyalKnight
  * @Date: 2020-07-13 16:41:16
  * @LastEditors: RoyalKnight
- * @LastEditTime: 2020-07-16 15:00:28
+ * @LastEditTime: 2020-08-28 19:33:11
  */ 
 import Layout from '@/views/layout'
 
@@ -12,7 +12,7 @@ export default [
   // 主页
   {
     path: '/', 
-    redirect: '/center'
+    redirect: '/home'
   },
   {
     path: '/center',
@@ -25,10 +25,10 @@ export default [
         component: () => import( '../views/center'),
         children:[
           {
-            path: '',
-            name: 'center1',
-            meta: { title: 'center1', icon: 'deploy' },
-            component: () => import( '../views/center1')
+            path: '/chat',
+            name: 'chat',
+            meta: { title: 'chat', icon: 'deploy' },
+            component: () => import( '../views/chat')
           },
           {
             path: 'center2',
