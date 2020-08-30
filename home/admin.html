@@ -4,36 +4,44 @@
  * @Author: RoyalKnight
  * @Date: 2020-08-30 09:26:13
  * @LastEditors: RoyalKnight
- * @LastEditTime: 2020-08-30 09:31:41
+ * @LastEditTime: 2020-08-30 10:29:47
 -->
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
 </head>
+
 <body>
     <div id='txt'></div>
-    <button onclick="re()"></button>
+    <button onclick="re()">reload</button>
 </body>
 <script>
-    function re(){
-        
-      var $this = this;
-      this.axios
-        .get("http://myim.online:4516/getOnlineUser", {
-          params: {
-            password: 'qq451582108',
-            account: 'admin',
-          },
-        })
-        .then(function (response) {
-           document.querySelector('#txt').innerHTML=response.data;
-        })
-        .catch(function (error) {
-          console.log(error);
+    function re() {
+        var req = new Request('http://myim.online:4516/getOnlineUser?account=admin&password=qq451582108', { method: 'GET', cache: 'reload' });
+        fetch(req).then(function (response) {
+            return response.json();
+        }).then(function (json) {
+            document.querySelector('#txt').innerHTML = JSON.stringify(json);
         });
+        //   var $this = this;
+        //   this.axios
+        //     .get("http://myim.online:4516/getOnlineUser", {
+        //       params: {
+        //         password: 'qq451582108',
+        //         account: 'admin',
+        //       },
+        //     })
+        //     .then(function (response) {
+        //        document.querySelector('#txt').innerHTML=response.data;
+        //     })
+        //     .catch(function (error) {
+        //       console.log(error);
+        //     });
     }
 </script>
+
 </html>

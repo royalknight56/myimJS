@@ -4,14 +4,19 @@
  * @Autor: RoyalKnight
  * @Date: 2020-07-13 17:30:56
  * @LastEditors: RoyalKnight
- * @LastEditTime: 2020-08-29 22:21:33
+ * @LastEditTime: 2020-08-30 18:24:38
 --> 
 <template>
 <div>
-    home
-    <input id="account" v-model="account" />
-    <input id="password" v-model="password" />
-    <button @click="login()">Login</button>
+    home<br>
+    <input id="account" v-model="account" /><br>
+    <input id="password" v-model="password" /><br>
+    <button @click="login()">Login</button><br>
+    register<br>
+    <input id="raccount" v-model="raccount" placeholder="account" /><br>
+    <input id="rpassword" v-model="rpassword" placeholder="password" /><br>
+    <input id="rusername" v-model="rusername"  placeholder="username"/><br>
+    <button @click="register()">register</button><br>
 
     <home-tool></home-tool>
 </div>
@@ -51,6 +56,9 @@ export default {
     return {
       account: "admin",
       password: "admin",
+      raccount: "",
+      rpassword: "",
+      rusername:'',
     };
   },
   methods:{
@@ -77,6 +85,27 @@ export default {
           console.log(error);
         });
     },
+    register: function () {
+      this.axios
+        .post("http://"+process.env.VUE_APP_API+":"+process.env.VUE_APP_API_REQ+"/register", {
+          account: this.raccount,
+          password: this.rpassword,
+          username: this.rusername,
+        })
+        .then(function (response) {
+          if(response.data.state){
+            console.log('注册成功')
+            localStorage.setItem("myimAccount", response.data.account);
+            localStorage.setItem("myimToken", response.data.token);
+          }else{
+            console.log('注册失败')
+          }
+          
+        })
+        .catch(function (error) {
+          console.log(error);
+        });
+    }
   }
 }
 </script>

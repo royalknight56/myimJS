@@ -4,7 +4,7 @@
  * @Author: RoyalKnight
  * @Date: 2020-08-28 08:59:50
  * @LastEditors: RoyalKnight
- * @LastEditTime: 2020-08-29 20:32:41
+ * @LastEditTime: 2020-08-30 18:33:40
  */
 var mysql = require('mysql');
 var authLevel = require('./authLevel');
@@ -12,7 +12,7 @@ var sql;
 var connection = mysql.createConnection({
     host: 'localhost',
     user: 'root',
-    password: '123456',
+    password: 'qq451582108',
     database: 'nodechat'
 });
 
@@ -74,15 +74,16 @@ sql = {
             'UPDATE `nodechat`.`friend` SET `pendding` = ? WHERE (`own` = ?) and (`beowned` = ?);',
             [pendding, own, beoened]);
     },
-    putMessage: function (account, to, message, time) {
-        var addSql = 'INSERT INTO `nodechat`.`messages`(`id`, `own`, `from`, `to`, `message`, `time`) VALUES (?, ?, ?, ?, ?, ?);';
-        var addSql_Params = [0, account, account, to, message, time];
 
-        connection.query(addSql, addSql_Params, function (error, results, fields) {
-            if (error) {
-                console.log(error)
-            }
-        });
+    putUser: function (account,password,username,token) {
+        return SQLexc(
+            "INSERT INTO `nodechat`.`user` (`id`, `account`, `password`, `username`, `type`, `token`, `auth`, `state`) VALUES (?, ?, ?, ?, ?, ?, ?, ?);",
+            [0,account,password, username,'com',token,2,'offline']);
+    },
+    putMessage: function (own,account, to, message, time) {
+        return SQLexc(
+            'INSERT INTO `nodechat`.`messages`(`id`, `own`, `from`, `to`, `message`, `time`) VALUES (?, ?, ?, ?, ?, ?);',
+            [0, own, account, to, message, time]);
     },
     putFriend: function (own, beowned, pendding) {
         return SQLexc(
@@ -124,11 +125,14 @@ sql = {
     },
     getMessageWith: function (account, withWho) {
         return SQLexc(
-            `select * from messages 
-                where own=? and 
-                ((messages.from=? and messages.to=?) 
-                or 
-                (messages.from=? and messages.to=?))`,
+            `select * from
+            (select * from messages 
+            where own=? and 
+            ((messages.from=? and messages.to=?) 
+            or 
+            (messages.from=? and messages.to=?))
+            order by time desc limit 0,20) as a
+            order by time`,
             [account, account, withWho, withWho, account]);
     },
     deleteFriend: async function (account, withWho) {

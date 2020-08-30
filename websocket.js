@@ -4,11 +4,20 @@
  * @Author: RoyalKnight
  * @Date: 2020-08-28 15:57:53
  * @LastEditors: RoyalKnight
- * @LastEditTime: 2020-08-29 21:44:52
+ * @LastEditTime: 2020-08-30 18:29:37
  */
 var ws = require("nodejs-websocket");
 var mysqlCon = require('./mysql');
+var fs = require("fs");
 var conArr=[]
+function genToken() {
+    var ar = '1234567890abcdefghijklmnopqrstuvwxyz'
+    var re = ''
+    for (let i = 0; i < 30; i++) {
+        re += ar[parseInt(Math.random() * 30)]
+    }
+    return re;
+}
 var server = ws.createServer(function(conn){
     
     conn.on("text",async function (str) {
@@ -25,7 +34,6 @@ var server = ws.createServer(function(conn){
                     if(value){
                         conn.account=obj.account;
                         conArr.push(conn)
-                        console.log('在线人数'+conArr.length)
                         conn.send(JSON.stringify({
                             type:'state',
                             message:'acc'
@@ -38,7 +46,7 @@ var server = ws.createServer(function(conn){
                 conn.close()
             })
         }else if(obj.type=='message'){
-            if(obj.to){
+            if(obj.to&&(obj.account!=obj.to)){
                 await mysqlCon.ifHaveAuth(1,obj.token,obj.account).catch((e)=>{
                     conn.close()
                 })
@@ -47,12 +55,16 @@ var server = ws.createServer(function(conn){
                 time=time.getFullYear()+'-'+(time.getMonth()+1)+'-'+time.getDate()+' '+time.getHours()+':'+time.getMinutes()+':'+time.getSeconds()
                 if(accept){
                     obj.time=time.toString();
+                    obj.token=""
                     accept.send(JSON.stringify(obj))
-                }else{
-                    console.log('null')
+                }
+                if(obj.message.type=='img'){
+                    
+                }else if(obj.message.type=='txt'){
+                    mysqlCon.putMessage(obj.account,obj.account,obj.to,JSON.stringify(obj.message),time)
+                    mysqlCon.putMessage(obj.to,obj.account,obj.to,JSON.stringify(obj.message),time)
                 }
                 //'9999-12-31 23:59:59'
-                mysqlCon.putMessage(obj.account,obj.to,obj.message,time)
             }
         }else if(obj.type=='system'){
             await mysqlCon.ifHaveAuth(1,obj.token,obj.account).catch((e)=>{

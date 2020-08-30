@@ -4,7 +4,7 @@
  * @Autor: RoyalKnight
  * @Date: 2020-07-14 10:36:46
  * @LastEditors: RoyalKnight
- * @LastEditTime: 2020-08-29 23:47:10
+ * @LastEditTime: 2020-08-30 18:26:25
 --> 
 <template>
   <div>
@@ -23,14 +23,18 @@
       v-for="item in friendList"
       v-bind:key="item.account"
       @click="getMessageWith(item.account)"
-    >{{item.username}}-- {{item.account}}</div>---------message
+    >{{item.username}}-- {{item.account}}</div>
+    <br />---------message
     <div>
       <div v-for="(item,index) in messageList" :key="index">
         {{item.time | timeform}}
         <br />
         {{item.from}}
         <br />
-        {{item.message}}
+        <div v-if="item.message.type=='img'">
+          <img :src="item.message.img"/>
+        </div>
+        <div v-if="item.message.type=='txt'">{{item.message.txt}}</div>
         <br />
       </div>
     </div>---------requerst
@@ -66,6 +70,8 @@
     <br />
     <input v-model="typing" />
     <button @click="sendMessage()">send</button>
+    <input accept="image/jpeg, image/jpg, image/png" id="filetest" type="file" />
+    <button @click="sendImg()">send</button>
   </div>
 </template>
 
@@ -106,8 +112,10 @@ export default {
   mounted: function () {
     this.account = this.$store.state.account;
     var $this = this;
-    
-    ws = new WebSocket("ws://"+process.env.VUE_APP_API+':'+process.env.VUE_APP_API_WEBS);
+
+    ws = new WebSocket(
+      "ws://" + process.env.VUE_APP_API + ":" + process.env.VUE_APP_API_WEBS
+    );
     ws.onopen = function () {
       var sendBuffer = JSON.stringify({
         type: "auth",
@@ -123,15 +131,46 @@ export default {
       var rec = JSON.parse(e.data);
       if (rec.type == "message") {
         if (rec.from == $this.chosenFriend) {
-          $this.messageList.push({
-            message: rec.message,
-            from: rec.from,
-            to: rec.to,
-            time: rec.time,
-            own: $this.$store.state.account,
-            id: 0,
-          });
+          if (rec.message.type == "txt") {
+            $this.messageList.push({
+              message: {
+                type: "txt",
+                txt: rec.message.txt,
+              },
+              from: rec.from,
+              to: rec.to,
+              time: rec.time,
+              own: $this.$store.state.account,
+              id: 0,
+            });
+          } else if (rec.message.type == "img") {
+            $this.messageList.push({
+              message: {
+                type: "img",
+                img:  rec.message.img,
+              },
+              from: $this.$store.state.account,
+              to: $this.chosenFriend,
+              time: new Date(),
+              own: $this.$store.state.account,
+              id: 0,
+            });
+          }
         } else {
+          if (rec.message.type == "img") {
+            console.log(rec)
+            $this.messageList.push({
+              message: {
+                type: "img",
+                img:  rec.message.img,
+              },
+              from: $this.$store.state.account,
+              to: $this.chosenFriend,
+              time: new Date(),
+              own: $this.$store.state.account,
+              id: 0,
+            });
+          }
           console.log("其他需提醒" + rec.from);
         }
       } else if (rec.type == "system") {
@@ -155,12 +194,19 @@ export default {
     getFriend: function () {
       var $this = this;
       this.axios
-        .get("http://"+process.env.VUE_APP_API+":"+process.env.VUE_APP_API_REQ+"/getFriend", {
-          params: {
-            token: $this.$store.state.token,
-            account: $this.$store.state.account,
-          },
-        })
+        .get(
+          "http://" +
+            process.env.VUE_APP_API +
+            ":" +
+            process.env.VUE_APP_API_REQ +
+            "/getFriend",
+          {
+            params: {
+              token: $this.$store.state.token,
+              account: $this.$store.state.account,
+            },
+          }
+        )
         .then(function (response) {
           $this.friendList = response.data;
         })
@@ -171,12 +217,19 @@ export default {
     confirmFriend: function (from, to) {
       var $this = this;
       this.axios
-        .post("http://"+process.env.VUE_APP_API+":"+process.env.VUE_APP_API_REQ+"/confirmFriend", {
-          token: $this.$store.state.token,
-          account: $this.$store.state.account,
-          from,
-          to,
-        })
+        .post(
+          "http://" +
+            process.env.VUE_APP_API +
+            ":" +
+            process.env.VUE_APP_API_REQ +
+            "/confirmFriend",
+          {
+            token: $this.$store.state.token,
+            account: $this.$store.state.account,
+            from,
+            to,
+          }
+        )
         .then(function (response) {
           $this.friendReq = response.data;
           $this.getFriendRequest();
@@ -188,12 +241,19 @@ export default {
     getFriendRequest: function () {
       var $this = this;
       this.axios
-        .get("http://"+process.env.VUE_APP_API+":"+process.env.VUE_APP_API_REQ+"/getFriendRequest", {
-          params: {
-            token: $this.$store.state.token,
-            account: $this.$store.state.account,
-          },
-        })
+        .get(
+          "http://" +
+            process.env.VUE_APP_API +
+            ":" +
+            process.env.VUE_APP_API_REQ +
+            "/getFriendRequest",
+          {
+            params: {
+              token: $this.$store.state.token,
+              account: $this.$store.state.account,
+            },
+          }
+        )
         .then(function (response) {
           $this.friendReq = response.data;
         })
@@ -204,12 +264,19 @@ export default {
     acceptFriend: function (from) {
       var $this = this;
       this.axios
-        .post("http://"+process.env.VUE_APP_API+":"+process.env.VUE_APP_API_REQ+"/acceptFriend", {
-          token: $this.$store.state.token,
-          account: $this.$store.state.account,
-          from: from,
-          to: $this.$store.state.account,
-        })
+        .post(
+          "http://" +
+            process.env.VUE_APP_API +
+            ":" +
+            process.env.VUE_APP_API_REQ +
+            "/acceptFriend",
+          {
+            token: $this.$store.state.token,
+            account: $this.$store.state.account,
+            from: from,
+            to: $this.$store.state.account,
+          }
+        )
         .then(function () {})
         .catch(function (error) {
           console.log(error);
@@ -218,12 +285,19 @@ export default {
     rejectFriend: function (from) {
       var $this = this;
       this.axios
-        .post("http://"+process.env.VUE_APP_API+":"+process.env.VUE_APP_API_REQ+"/rejectFriend", {
-          token: $this.$store.state.token,
-          account: $this.$store.state.account,
-          from: from,
-          to: $this.$store.state.account,
-        })
+        .post(
+          "http://" +
+            process.env.VUE_APP_API +
+            ":" +
+            process.env.VUE_APP_API_REQ +
+            "/rejectFriend",
+          {
+            token: $this.$store.state.token,
+            account: $this.$store.state.account,
+            from: from,
+            to: $this.$store.state.account,
+          }
+        )
         .then(function () {})
         .catch(function (error) {
           console.log(error);
@@ -231,19 +305,25 @@ export default {
     },
     sendMessage: function () {
       var $this = this;
-      if ($this.chosenFriend) {
+      if ($this.chosenFriend&&$this.chosenFriend!=$this.account) {
         ws.send(
           JSON.stringify({
             type: "message",
             token: $this.$store.state.token,
             account: $this.$store.state.account,
-            message: this.typing,
+            message: {
+              type: "txt",
+              txt: this.typing,
+            },
             to: $this.chosenFriend,
             from: $this.$store.state.account,
           })
         );
         $this.messageList.push({
-          message: this.typing,
+          message: {
+            type: "txt",
+            txt: this.typing,
+          },
           from: $this.$store.state.account,
           to: $this.chosenFriend,
           time: new Date(),
@@ -253,14 +333,57 @@ export default {
         this.typing = "";
       }
     },
+    sendImg: function () {
+      var $this = this;
+      console.log(document.getElementById("filetest").files[0]);
+      // var imgFile = document.getElementById("filetest").files[0];
+      var reader = new FileReader();
+      reader.readAsBinaryString(document.getElementById("filetest").files[0]);
+      // var imgUrlBase64 = reader.readAsDataURL(document.getElementById("filetest").files[0]);
+      reader.onloadend = function () {
+        if ($this.chosenFriend) {
+          var postdata = {
+            type: "message",
+            token: $this.$store.state.token,
+            account: $this.$store.state.account,
+            message: {
+              type: "img",
+              img: reader.result,
+            },
+            from: $this.$store.state.account,
+            to: $this.chosenFriend,
+          };
+          $this.axios
+            .post(
+              "http://" +
+                process.env.VUE_APP_API +
+                ":" +
+                process.env.VUE_APP_API_REQ +
+                "/sendImg",
+              postdata
+            )
+            .then(function () {})
+            .catch(function (error) {
+              console.log(error);
+            });
+        }
+      };
+    },
     deletefun: function () {
       var $this = this;
       this.axios
-        .post("http://"+process.env.VUE_APP_API+":"+process.env.VUE_APP_API_REQ+"/deleteFriend", {
-          token: $this.$store.state.token,
-          account: $this.$store.state.account,
-          withWho: $this.delFriendAccount,
-        })
+        .post(
+          "http://" +
+            process.env.VUE_APP_API +
+            ":" +
+            process.env.VUE_APP_API_REQ +
+            "/deleteFriend",
+          {
+            token: $this.$store.state.token,
+            account: $this.$store.state.account,
+            withWho: $this.delFriendAccount,
+          }
+        )
         .then(function () {})
         .catch(function (error) {
           console.log(error);
@@ -269,11 +392,18 @@ export default {
     addFriend: function () {
       var $this = this;
       this.axios
-        .post("http://"+process.env.VUE_APP_API+":"+process.env.VUE_APP_API_REQ+"/addFriend", {
-          token: $this.$store.state.token,
-          account: $this.$store.state.account,
-          withWho: $this.addFriendAccount,
-        })
+        .post(
+          "http://" +
+            process.env.VUE_APP_API +
+            ":" +
+            process.env.VUE_APP_API_REQ +
+            "/addFriend",
+          {
+            token: $this.$store.state.token,
+            account: $this.$store.state.account,
+            withWho: $this.addFriendAccount,
+          }
+        )
         .then(function () {})
         .catch(function (error) {
           console.log(error);
@@ -283,13 +413,20 @@ export default {
       this.chosenFriend = withWho;
       var $this = this;
       this.axios
-        .get("http://"+process.env.VUE_APP_API+":"+process.env.VUE_APP_API_REQ+"/getMessageWith", {
-          params: {
-            token: $this.$store.state.token,
-            account: $this.$store.state.account,
-            withWho: withWho,
-          },
-        })
+        .get(
+          "http://" +
+            process.env.VUE_APP_API +
+            ":" +
+            process.env.VUE_APP_API_REQ +
+            "/getMessageWith",
+          {
+            params: {
+              token: $this.$store.state.token,
+              account: $this.$store.state.account,
+              withWho: withWho,
+            },
+          }
+        )
         .then(function (response) {
           console.log(response.data);
           $this.messageList = response.data;

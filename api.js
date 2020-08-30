@@ -4,7 +4,7 @@
  * @Author: RoyalKnight
  * @Date: 2020-08-28 15:57:53
  * @LastEditors: RoyalKnight
- * @LastEditTime: 2020-08-30 09:29:33
+ * @LastEditTime: 2020-08-30 18:21:24
  */
 /*
  * @Descripttion: 
@@ -17,6 +17,8 @@
 var mysqlCon = require('./mysql');
 var com = require('./com')
 var wsArr = require('./websocket')
+
+var fs = require("fs");
 mysqlCon.testConnection(function (ifcon) {
     if (ifcon) {
         console.log('Mysql Connect success √');
@@ -79,6 +81,18 @@ var api = {
             }
         }
     },
+    register:{
+        type:'POST',
+        data: async function (obj, res) {
+            try {
+                var token = genToken();
+                await mysqlCon.putUser (obj.account,obj.password,obj.username,token)
+                com.RES(res, { state: true, token: token, account: obj.account })
+            } catch{
+                com.RES(res, { state: false })
+            }
+        }
+    },
     getFriend: {
         type: 'GET',
         data: async function (obj, res) {
@@ -115,6 +129,9 @@ var api = {
             try {
                 await mysqlCon.ifHaveAuth(1, obj.token, obj.account)
                 var value = await mysqlCon.getMessageWith(obj.account, obj.withWho);
+                for(let i=0;i<value.length;i++){
+                    value[i].message=JSON.parse(value[i].message);
+                }
                 com.RES(res, value)
             } catch{
                 com.RES(res, [])
@@ -130,7 +147,6 @@ var api = {
                 })
                 return 0
             }
-            console.log('not')
             try {
                 await mysqlCon.ifHaveAuth(1, obj.token, obj.account)
                 await mysqlCon.addFriend(obj.account, obj.withWho);
@@ -150,6 +166,37 @@ var api = {
                 com.RES(res, {
                     state: false
                 })
+            }
+        }
+    },
+    sendImg:{
+        type:'POST',
+        data:async function(obj,res){
+            try {
+                await mysqlCon.ifHaveAuth(1, obj.token, obj.account)
+                var token=genToken()
+                fs.writeFile(`./dist/img/${token}.png`, obj.message.img, "binary", (error) => {
+                    console.log(error)
+                })
+                obj.message.img=`img/${token}.png`
+                obj.token='';
+                var time=new Date();
+                time=time.getFullYear()+'-'+(time.getMonth()+1)+'-'+time.getDate()+' '+time.getHours()+':'+time.getMinutes()+':'+time.getSeconds()
+                mysqlCon.putMessage(obj.account,obj.account,obj.to,JSON.stringify(obj.message),time)
+                mysqlCon.putMessage(obj.to,obj.account,obj.to,JSON.stringify(obj.message),time)
+
+                var accept = wsArr.find(element => element.account == obj.account);
+                if (accept) {
+                    accept.send(JSON.stringify(obj))
+                }
+                accept = wsArr.find(element => element.account == obj.to);
+                if (accept) {
+                    accept.send(JSON.stringify(obj))
+                }
+                com.RES(res, { state: true })
+
+            }catch{
+                com.RES(res, { state: false })
             }
         }
     },
