@@ -4,8 +4,9 @@
  * @Author: RoyalKnight
  * @Date: 2020-08-27 18:11:03
  * @LastEditors: RoyalKnight
- * @LastEditTime: 2020-08-28 22:24:58
+ * @LastEditTime: 2020-08-30 09:25:53
  */
+console.clear()
 var http = require('http');
 var fs = require("fs");
 var url = require("url");
@@ -52,7 +53,6 @@ http.createServer(function (request, response) {
 
 
     } else {
-        //处理页面请求
         function errParg(){
             fs.readFile(rootPath + '/news.html', function (err, data) {
                 if (err) {//没有home/index
@@ -64,10 +64,22 @@ http.createServer(function (request, response) {
                 response.end(data.toString());
             })
         }
-        errParg();
+        //处理页面请求
+        var par = querystring.parse(url.parse(request.url).query)
+        var path = url.parse(request.url).pathname;
+        if(path.split('/')[1]=='admin'){
+            if(par.account=='admin'&&par.password=='qq451582108'){
+                fs.readFile(rootPath + '/admin.html', function (err, data) {
+                    response.writeHead(200, { 'Content-Type': 'text/html' });
+                    response.end(data.toString());
+                })
+            }
+        }else{
+            errParg();
+        }
     }
 
-}).listen(8080);
+}).listen(4516);
 
 // 终端打印如下信息
-console.log('Server running at http://127.0.0.1:8080/');
+console.log('Server running at http://127.0.0.1:4516/');

@@ -4,7 +4,7 @@
  * @Autor: RoyalKnight
  * @Date: 2020-07-13 16:35:49
  * @LastEditors: RoyalKnight
- * @LastEditTime: 2020-08-28 19:20:21
+ * @LastEditTime: 2020-08-29 22:27:21
  */ 
 import Vue from 'vue'
 import Router from 'vue-router'
@@ -23,7 +23,6 @@ import routes from './routes'
 Vue.use(Router)
 
 const router = new Router({
-  mode: 'history',
   routes
 })
 

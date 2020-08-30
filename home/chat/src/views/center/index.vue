@@ -4,12 +4,10 @@
  * @Autor: RoyalKnight
  * @Date: 2020-07-14 10:36:46
  * @LastEditors: RoyalKnight
- * @LastEditTime: 2020-08-28 19:25:50
+ * @LastEditTime: 2020-08-29 22:21:45
 --> 
 <template>
   <div>
-    center-Route
-    
     <router-view></router-view>
   </div>
 </template>

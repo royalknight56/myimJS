@@ -4,7 +4,7 @@
  * @Autor: RoyalKnight
  * @Date: 2020-07-13 16:18:49
  * @LastEditors: RoyalKnight
- * @LastEditTime: 2020-08-28 18:49:16
+ * @LastEditTime: 2020-08-29 22:25:02
  */ 
 import Vue from 'vue'
 import App from './App.vue'
@@ -23,3 +23,6 @@ new Vue({
   render: h => h(App),
 }).$mount('#app')
 Vue.prototype.$store=store;
+if (process.env.VUE_APP_IFDEV == "true") {
+  // console.log=function(){};
+}
