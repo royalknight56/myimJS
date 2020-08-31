@@ -4,7 +4,7 @@
  * @Author: RoyalKnight
  * @Date: 2020-08-28 15:57:53
  * @LastEditors: RoyalKnight
- * @LastEditTime: 2020-08-30 18:21:24
+ * @LastEditTime: 2020-08-31 20:23:44
  */
 /*
  * @Descripttion: 
@@ -17,7 +17,7 @@
 var mysqlCon = require('./mysql');
 var com = require('./com')
 var wsArr = require('./websocket')
-
+var authLevel = require('./authLevel');
 var fs = require("fs");
 mysqlCon.testConnection(function (ifcon) {
     if (ifcon) {
@@ -61,7 +61,10 @@ var api = {
                 if (value.state == 'offline') {
                     mysqlCon.setState(obj.account, 'online')
                 }
-                com.RES(res, { iflogin: 'yes', token: token, account: obj.account })
+                var user=await mysqlCon.getUser(obj.account)
+                user=user[0]
+                var retobj= { iflogin: 'yes', token: token, account: obj.account,username:user.username,type:user.type,auth:user.auth }
+                com.RES(res,retobj)
             } else {
                 com.RES(res, { iflogin: 'no' })
             }
@@ -71,11 +74,31 @@ var api = {
         type: 'POST',
         data: async function (obj, res) {
             try {
-                await mysqlCon.ifHaveAuth(1, obj.token, obj.account);
+                await mysqlCon.ifHaveAuth(authLevel['autoLogin'], obj.token, obj.account);
                 var token = genToken();
                 mysqlCon.setToken(obj.account, token)
                 mysqlCon.setState(obj.account, 'online')
-                com.RES(res, { state: true, token: token, account: obj.account })
+                var user=await mysqlCon.getUser(obj.account)
+                user=user[0]
+                com.RES(res, { state: true, token: token, account: obj.account,username:user.username,type:user.type,auth:user.auth})
+            } catch{
+                com.RES(res, { state: false })
+            }
+        }
+    },
+    phonelogin: {
+        type: 'POST',
+        data: async function (obj, res) {
+            try {
+                var token = genToken();
+                var account=genToken();
+                var password=genToken();
+                await mysqlCon.putUser (account,password,'临时账号',token,3,'test')
+                var user=await mysqlCon.getUser(account)
+                mysqlCon.putFriend(account,'gx','accept')
+                mysqlCon.putFriend('gx',account,'accept')
+                user=user[0]
+                com.RES(res, { state: true,iflogin: 'yes', token: token, account: account,username:user.username,type:user.type,auth:user.auth})
             } catch{
                 com.RES(res, { state: false })
             }
@@ -87,7 +110,7 @@ var api = {
             try {
                 var token = genToken();
                 await mysqlCon.putUser (obj.account,obj.password,obj.username,token)
-                com.RES(res, { state: true, token: token, account: obj.account })
+                com.RES(res, { state: true, token: token, account: obj.account,username: obj.username})
             } catch{
                 com.RES(res, { state: false })
             }
@@ -97,7 +120,7 @@ var api = {
         type: 'GET',
         data: async function (obj, res) {
             try {
-                await mysqlCon.ifHaveAuth(1, obj.token, obj.account);
+                await mysqlCon.ifHaveAuth(authLevel['getFriend'], obj.token, obj.account);
                 var value = await mysqlCon.getFriend(obj.account);
                 com.RES(res, value)
             } catch{
@@ -111,7 +134,7 @@ var api = {
         type: 'GET',
         data: async function (obj, res) {
             try {
-                await mysqlCon.ifHaveAuth(1, obj.token, obj.account);
+                await mysqlCon.ifHaveAuth(authLevel['getFriendRequest'], obj.token, obj.account);
                 var value = await mysqlCon.getFriendReq(obj.account);
                 for(let i=0;i<value.length;i++){
                     value[i].from=value[i].own
@@ -127,12 +150,24 @@ var api = {
         type: 'GET',
         data: async function (obj, res) {
             try {
-                await mysqlCon.ifHaveAuth(1, obj.token, obj.account)
+                await mysqlCon.ifHaveAuth(authLevel['getMessageWith'], obj.token, obj.account)
                 var value = await mysqlCon.getMessageWith(obj.account, obj.withWho);
                 for(let i=0;i<value.length;i++){
                     value[i].message=JSON.parse(value[i].message);
                 }
                 com.RES(res, value)
+                mysqlCon.setUnreadZero(obj.account, obj.withWho);
+            } catch{
+                com.RES(res, [])
+            }
+        }
+    },
+    readMessageWith: {
+        type: 'POST',
+        data: async function (obj, res) {
+            try {
+                await mysqlCon.ifHaveAuth(authLevel['readMessageWith'], obj.token, obj.account)
+                mysqlCon.setUnreadZero(obj.account, obj.withWho);
             } catch{
                 com.RES(res, [])
             }
@@ -148,7 +183,7 @@ var api = {
                 return 0
             }
             try {
-                await mysqlCon.ifHaveAuth(1, obj.token, obj.account)
+                await mysqlCon.ifHaveAuth(authLevel['addFriend'], obj.token, obj.account)
                 await mysqlCon.addFriend(obj.account, obj.withWho);
                 var accept = wsArr.find(element => element.account == obj.withWho);
                 if (accept) {
@@ -173,7 +208,7 @@ var api = {
         type:'POST',
         data:async function(obj,res){
             try {
-                await mysqlCon.ifHaveAuth(1, obj.token, obj.account)
+                await mysqlCon.ifHaveAuth(authLevel['sendImg'], obj.token, obj.account)
                 var token=genToken()
                 fs.writeFile(`./dist/img/${token}.png`, obj.message.img, "binary", (error) => {
                     console.log(error)
@@ -182,9 +217,11 @@ var api = {
                 obj.token='';
                 var time=new Date();
                 time=time.getFullYear()+'-'+(time.getMonth()+1)+'-'+time.getDate()+' '+time.getHours()+':'+time.getMinutes()+':'+time.getSeconds()
+                obj.time=time
                 mysqlCon.putMessage(obj.account,obj.account,obj.to,JSON.stringify(obj.message),time)
                 mysqlCon.putMessage(obj.to,obj.account,obj.to,JSON.stringify(obj.message),time)
-
+                mysqlCon.setUnreadAdd(obj.to, obj.account);
+                
                 var accept = wsArr.find(element => element.account == obj.account);
                 if (accept) {
                     accept.send(JSON.stringify(obj))
@@ -204,7 +241,7 @@ var api = {
         type: 'POST',
         data: async function (obj, res) {
             try {
-                await mysqlCon.ifHaveAuth(1, obj.token, obj.account)
+                await mysqlCon.ifHaveAuth(authLevel['acceptFriend'], obj.token, obj.account)
                 var value = await mysqlCon.getPenddingFriend(obj.account);
                 if (value.find(element => element.beowned == obj.account)) {
                     mysqlCon.setPendding(obj.from, obj.account, 'accept')
@@ -238,7 +275,7 @@ var api = {
         type: 'POST',
         data: async function (obj, res) {
             try {
-                await mysqlCon.ifHaveAuth(1, obj.token, obj.account)
+                await mysqlCon.ifHaveAuth(authLevel['rejectFriend'], obj.token, obj.account)
                 await mysqlCon.setPendding(obj.from, obj.account, 'reject')
                 await mysqlCon.putFriend(obj.account,obj.from,'reject')
                 var accept = wsArr.find(element => element.account == obj.from);
@@ -269,7 +306,7 @@ var api = {
         type: 'POST',
         data: async function (obj, res) {
             try {
-                await mysqlCon.ifHaveAuth(1, obj.token, obj.account)
+                await mysqlCon.ifHaveAuth(authLevel['deleteFriend'], obj.token, obj.account)
                 await mysqlCon.deleteFriend(obj.account, obj.withWho);
                 await mysqlCon.deleteFriend(obj.withWho, obj.account);
                 com.RES(res, {
@@ -286,7 +323,7 @@ var api = {
         type: 'POST',
         data: async function (obj, res) {
             try {
-                await mysqlCon.ifHaveAuth(1, obj.token, obj.account)
+                await mysqlCon.ifHaveAuth(authLevel['confirmFriend'], obj.token, obj.account)
                 if(obj.account==obj.from||obj.account==obj.to){
                     await mysqlCon.deleteFriend(obj.from, obj.to);
                 }

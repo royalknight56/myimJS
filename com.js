@@ -4,7 +4,6 @@ var com={
             'Content-Type': 'application/json',
             'Access-Control-Allow-Origin':'*'
         });
-
         res.write(JSON.stringify(obj));
         res.end();
     }

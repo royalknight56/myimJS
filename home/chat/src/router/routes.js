@@ -4,7 +4,7 @@
  * @Autor: RoyalKnight
  * @Date: 2020-07-13 16:41:16
  * @LastEditors: RoyalKnight
- * @LastEditTime: 2020-08-28 19:33:11
+ * @LastEditTime: 2020-08-31 16:57:24
  */ 
 import Layout from '@/views/layout'
 
@@ -49,6 +49,18 @@ export default [
         name: 'home',
         meta: { title: 'home', icon: 'deploy' },
         component: () => import( '../views/home')
+      }
+    ]
+  },
+  {
+    path: '/home2',
+    component: Layout,
+    children: [
+      {
+        path: '',
+        name: 'home2',
+        meta: { title: 'home2', icon: 'deploy' },
+        component: () => import( '../views/home2')
       }
     ]
   },

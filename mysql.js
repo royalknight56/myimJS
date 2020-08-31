@@ -4,10 +4,9 @@
  * @Author: RoyalKnight
  * @Date: 2020-08-28 08:59:50
  * @LastEditors: RoyalKnight
- * @LastEditTime: 2020-08-30 18:33:40
+ * @LastEditTime: 2020-08-31 17:53:01
  */
 var mysql = require('mysql');
-var authLevel = require('./authLevel');
 var sql;
 var connection = mysql.createConnection({
     host: 'localhost',
@@ -74,11 +73,20 @@ sql = {
             'UPDATE `nodechat`.`friend` SET `pendding` = ? WHERE (`own` = ?) and (`beowned` = ?);',
             [pendding, own, beoened]);
     },
-
-    putUser: function (account,password,username,token) {
+    setUnreadAdd: function (own, beoened) {
+        return SQLexc(
+            'UPDATE `nodechat`.`friend` SET `unread` = `unread`+1 WHERE (`own` = ?) and (`beowned` = ?);',
+            [own,beoened]);
+    },
+    setUnreadZero: function (own, beoened) {
+        return SQLexc(
+            'UPDATE `nodechat`.`friend` SET `unread` = 0 WHERE (`own` = ?) and (`beowned` = ?);',
+            [own,beoened]);
+    },
+    putUser: function (account,password,username,token,auth=5,type='com') {
         return SQLexc(
             "INSERT INTO `nodechat`.`user` (`id`, `account`, `password`, `username`, `type`, `token`, `auth`, `state`) VALUES (?, ?, ?, ?, ?, ?, ?, ?);",
-            [0,account,password, username,'com',token,2,'offline']);
+            [0,account,password, username,type,token,auth,'offline']);
     },
     putMessage: function (own,account, to, message, time) {
         return SQLexc(
@@ -92,12 +100,17 @@ sql = {
     },
     ifHaveAuth: function (right, token, account) {
         return SQLexc(
-            'SELECT auth,account FROM user WHERE token=? and account=? and auth>?',
+            'SELECT auth,account FROM user WHERE token=? and account=? and auth>=?',
             [token, account, right]);
+    },
+    getUser: function (account) {
+        return SQLexc(
+            "SELECT * FROM nodechat.user where account=?;",
+            [account]);
     },
     getFriend: function (account) {
         return SQLexc(
-            `SELECT account,username,type,pendding
+            `SELECT account,username,type,pendding,state,unread
                             FROM friend 
                             JOIN user
                             ON user.account = friend.beowned

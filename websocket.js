@@ -4,7 +4,7 @@
  * @Author: RoyalKnight
  * @Date: 2020-08-28 15:57:53
  * @LastEditors: RoyalKnight
- * @LastEditTime: 2020-08-30 18:29:37
+ * @LastEditTime: 2020-08-31 12:51:02
  */
 var ws = require("nodejs-websocket");
 var mysqlCon = require('./mysql');
@@ -19,12 +19,11 @@ function genToken() {
     return re;
 }
 var server = ws.createServer(function(conn){
-    
+    console.log(conArr.length)
     conn.on("text",async function (str) {
         var obj
         try{
             obj=JSON.parse(str);
-            
         }catch{
             return 
         }
@@ -63,6 +62,7 @@ var server = ws.createServer(function(conn){
                 }else if(obj.message.type=='txt'){
                     mysqlCon.putMessage(obj.account,obj.account,obj.to,JSON.stringify(obj.message),time)
                     mysqlCon.putMessage(obj.to,obj.account,obj.to,JSON.stringify(obj.message),time)
+                    mysqlCon.setUnreadAdd(obj.to, obj.account);
                 }
                 //'9999-12-31 23:59:59'
             }
