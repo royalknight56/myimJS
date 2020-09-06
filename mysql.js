@@ -4,7 +4,7 @@
  * @Author: RoyalKnight
  * @Date: 2020-08-28 08:59:50
  * @LastEditors: RoyalKnight
- * @LastEditTime: 2020-08-31 17:53:01
+ * @LastEditTime: 2020-09-06 10:46:22
  */
 var mysql = require('mysql');
 var sql;
@@ -59,12 +59,16 @@ sql = {
             }
         });
     },
+    setLogo: function (account, logo) {
+        return SQLexc(
+            'UPDATE `nodechat`.`user` SET `logo` = ? WHERE (`account` = ?);',
+            [logo, account]);
+    },
     setState: function (account, state) {
         var addSql = 'UPDATE `nodechat`.`user` SET `state` = ? WHERE (`account` = ?);';
         var addSql_Params = [state, account];
         connection.query(addSql, addSql_Params, function (error, results, fields) {
             if (error) {
-
             }
         });
     },
@@ -98,10 +102,25 @@ sql = {
             'INSERT INTO `nodechat`.`friend` (`own`, `beowned`, `pendding`) VALUES (?,?,?);',
             [own, beowned, pendding]);
     },
+    putCrowd: function (own, beowned,position='com') {
+        return SQLexc(
+            'INSERT INTO `nodechat`.`crowd` (`own`, `beowned`, `pendding`, `unread`, `position`) VALUES (?, ?, ?, ?, ?);',
+            [own, beowned, 'accept',0,position]);
+    },
+    putCrowdUser: function (account,name,master) {
+        return SQLexc(
+            "INSERT INTO `nodechat`.`crowduser` (`id`, `account`, `crowdname`,`master`) VALUES (?, ?, ?, ?);",
+            [0,account,name,master]);
+    },
     ifHaveAuth: function (right, token, account) {
         return SQLexc(
             'SELECT auth,account FROM user WHERE token=? and account=? and auth>=?',
             [token, account, right]);
+    },
+    getAfter: function () {
+        return SQLexc(
+            "SELECT * FROM nodechat.after;",
+            []);
     },
     getUser: function (account) {
         return SQLexc(
@@ -110,12 +129,36 @@ sql = {
     },
     getFriend: function (account) {
         return SQLexc(
-            `SELECT account,username,type,pendding,state,unread
+            `SELECT account,username,type,pendding,state,unread,logo
                             FROM friend 
                             JOIN user
                             ON user.account = friend.beowned
                             WHERE own=? and pendding='accept'`,
             [account]);
+    },
+    getCrowd: function (account) {
+        return SQLexc(
+            `SELECT *
+                            FROM crowd 
+                            WHERE own=? and pendding='accept'`,
+            [account]);
+    },
+    getCrowdUser: function (account) {
+        return SQLexc(
+            "SELECT * FROM nodechat.crowduser where account=?;",
+            [account]);
+    },
+    getSystemAlert: function () {
+        return SQLexc(
+            `SELECT * FROM systemalert `,
+            []);
+    },
+    getCrowdAccount: function (crowd) {
+        return SQLexc(
+            `SELECT *
+                            FROM crowd 
+                            WHERE beowned=? and pendding='accept'`,
+            [crowd]);
     },
     getPenddingFriend: function (account) {
         return SQLexc(
@@ -153,6 +196,13 @@ sql = {
             `
             DELETE FROM friend
             WHERE (own = ?) and (beowned = ?);
+            `,
+            [account, withWho]);
+    },
+    deleteCrowd: function (account, withWho) {
+        return SQLexc(
+            `
+            DELETE FROM crowd WHERE (own = ?) and (beowned = ?);
             `,
             [account, withWho]);
     },

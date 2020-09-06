@@ -79,10 +79,12 @@
 }
 
 .left_head{
-    height:60px;
-    width: 100%;
+    height:80px;
+    width: calc( 100% + 50px );
+    position: relative;
+    left: -50px;
     background-color: #303841;
-    border-bottom: 1px solid #303841;
+    border-bottom: 1px solid #7a7c7e77;
     padding: 10px 10px 20px 20px;
     box-sizing: border-box;
     overflow: hidden;
@@ -95,6 +97,10 @@
     position: relative;
     height: 200px;
     padding: 15px;
+}
+.right_typing_menu{
+    display: flex;
+    
 }
 .right_typing textarea{
     height: 80%;
@@ -154,6 +160,10 @@
     -webkit-font-smoothing: antialiased;
 }
 .menu_bar{
+    position: absolute;
+    left: -50px;
+    bottom: 0;
+    height: 100%;
     width: 50px;
     background-color: #2d3238;
     display: flex;
@@ -183,6 +193,25 @@
     background-color: #363e47;
     color:#f7f7f8;
 }
+.left_tab{
+    height: 30px;
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    border-bottom: 1px solid rgba(126, 126, 126, 0.445);
+}
+.chosen_left_tab{
+    background-color: #ffffff1f;
+}
+.left_tab_item{
+    width: 100%;
+    height: 30px;
+    text-align: center;
+    line-height: 30px;
+}
+.left_tab_item:hover{
+    background-color: #666870;
+}
 .right{
     height: 80vh;
     background-color: #f5f5f5;
@@ -203,6 +232,51 @@
     font-weight: 700;
     line-height: 50px;
     text-shadow: #76828c 0 0 0.1em;
+}
+.friend_opt_but{
+    position: absolute;
+    right: 0;
+    top: 0;
+    width: 30px;
+    height: 100%;
+    text-align: center;
+    background-color: #2d8bf052;
+    z-index: 1;
+}
+.friend_tab_close{
+    position: absolute;
+    left: 0;
+    width: 20px;
+    text-align: center;
+}
+.friend_opt{
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    top: 0;
+    left: 0;
+    overflow: hidden;
+    text-align: center;
+    transition: all 0.2s;
+}
+.friend_tab{
+    position: relative;
+    background-color: #2d8bf052;
+    backdrop-filter: saturate(180%) blur(20px);
+    left: 100%;
+    transition: all 0.2s;
+    z-index: 2;
+}
+.friend_menu{
+    display: flex;
+    justify-content: center;
+}
+.friend_tab_item{
+    width: 100px;
+    transition: all 0.2s;
+}
+.friend_tab_item:hover{
+    background-color: #7cb5f152;
 }
 .right_message{
     display: flex;
@@ -265,23 +339,76 @@
 }
 .title_h1{
     font-size: large;
+    display: inline;
+}
+.title_h2{
+    font-size: 10px;
+    display: inline;
 }
 .account_text{
+    position: relative;
+    left: 70px;
     color:rgb(199, 199, 199);
-    font-size: 25px;
+    font-size: 15px;
+}
+.username_text{
+    position: relative;
+    left: 70px;
+    color:rgb(231, 231, 231);
+    font-size: 20px;
+}
+.my_logo{
+    width: 50px;
+    height: 50px;
+    border: 1px solid rgb(185, 185, 185);
+    border-radius: 50%;
+    overflow: hidden;
+    position: absolute;
+    left: 20px;
+}
+.left_tab_under_outer{
+    overflow: hidden;
+    height: calc(100% - 110px);
+    width: 30vw;
+}
+.left_tab_under{
+    display: flex;
+    height: 100%;
+    left: 0%;
+    position: relative;
+    transition: all 0.3s;
 }
 .friend_list_outer{
-    height: calc(100% - 60px);
+    width: 100%;
+    height: 100%;
     overflow-y: auto;
+    flex-shrink: 0;
 }
 .friend_item{
     padding: 15px 20px;
+    height: 50px;
     cursor: pointer;
     position: relative;
     overflow: hidden;
     -webkit-transition: .2s;
     transition: .2s;
     border-bottom: 1px solid #586068;
+}
+.chosen_friend_item{
+    background-color: rgba(255, 255, 255, 0.301);
+}
+.friend_logo{
+    width: 50px;
+    height: 50px;
+    border: 1px solid rgb(185, 185, 185);
+    border-radius: 50%;
+    overflow: hidden;
+    position: absolute;
+    left: 20px;
+}
+.friend_info{
+    position: relative;
+    left: 60px;
 }
 .friend_username{
 
@@ -307,48 +434,6 @@
     padding: 10px 0;
     box-sizing: border-box;
 }
-.idialog{
-    position: fixed;
-    width: 300px;
-    height: fit-content;
-    background-color: #ffffff;
-    z-index: 3;
-    left: 50%;
-    top: 50%;
-    margin-left: -150px;
-    margin-top: -150px;
-    box-shadow: 0px 0px 1000px 1000px rgba(0, 0, 0, 0.5);
-}
-.idialog::after{
-    position: fixed;
-    width: 100%;
-    height: 100%;
-    content: " ";
-    display: block;
-    left: 0;
-    top: 0;
-    background-color: #2d8bf011;
-    z-index: -1;
-}
-.dialog_h1{
-    width: 100%;
-    text-align: center;
-    padding:15px 0;
-    font-size: 20px;
-    background-color: #2d3238;
-    color: #FFF;
-}
-.idialog input{
-    border: none;
-    margin:auto 0;
-    width: 100%;
-    display:inline;
-    height: 50px;
-    font-size: 20px;
-    outline: none;
-    text-align: center;
-    box-sizing: border-box;
-}
 .label {
     text-align: right;
     vertical-align: middle;
@@ -360,82 +445,12 @@
     -webkit-box-sizing: border-box;
     box-sizing: border-box;
   }
-.idialog .dialog_txt{
-    /* border: none;
-    margin:auto 0;
-    padding: 20px;
-    display:inline;
-    line-height: 80px;
-    font-size: 20px;
-    outline: none;
-    text-align: center; */
-    text-align: left;
-    vertical-align: middle;
-    float: left;
-    font-size: 14px;
-    color: #606266;
-    line-height: 40px;
-    padding: 12px ;
-    -webkit-box-sizing: border-box;
-    box-sizing: border-box;
-}
-.dialog_list{
-    max-height: 30vh;
-    overflow-y: auto;
-}
-.dialog_list_item{
-    background-color: #ffffff13;
-    padding: 0px 10px;
-    font-size:10px;
-    text-align: center;
-    margin: 10px;
-    box-shadow: 0 0 100px rgba(0, 0, 0, 0.082);
-}
-.dialog_list_item:hover{
-    background-color: #e6e6e6;
-}
 
-
-.idialog button{
-    border: none;
-    margin:auto 0;
-    width: 100%;
-    display:inline;
-    height: 40px;
-    font-size: 20px;
-    outline: none;
-    text-align: center;
-    opacity: 0.8;
-}
-.idialog .reject{
-    background-color: #ff999952;
-}
-.idialog .reject:hover{
-    background-color: #fad7d777;
-}
-.idialog .accept{
-    background-color:#5ed6b863;
-}
-.idialog .accept:hover{
-    background-color:  #a4d8cb80;
-}
-
-.idialog .confirm{
-    background-color: #92a1ac ;
-}
-.idialog .confirm:hover{
-    background-color:#b6c1c9;
-}
-.idialog .cancel{
-    background-color: #a57684;
-}
-.idialog .cancel:hover{
-    background-color: #bea1aa;
-}
 .have_req{
     color: #FFF;
     animation: slink 0.5s linear  infinite;
 }
+
 @keyframes slink{
     0%{
         color: #FFF;
@@ -447,3 +462,23 @@
         color: #FFF;
     }
 }
+
+@media screen and (max-width:500px){
+    .chat_show{
+        flex-direction: column;
+    }
+    .left_tab_under_outer {
+        width: 80vw;
+    }
+    .friend_list{
+        width: 80vw;
+    }
+    .menu_bar{
+        left: -40px;
+        width: 40px;
+    }
+    .left_head{
+        width: calc( 100% + 40px );
+        left: -40px;
+    }
+} 

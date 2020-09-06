@@ -4,7 +4,7 @@
  * @Autor: RoyalKnight
  * @Date: 2020-07-13 17:30:56
  * @LastEditors: RoyalKnight
- * @LastEditTime: 2020-08-31 18:43:41
+ * @LastEditTime: 2020-09-01 11:15:00
 --> 
 <template>
   <div class="login">
@@ -75,6 +75,7 @@ export default {
           $this.$store.dispatch("setAccount", response.data.account);
           $this.$store.dispatch("setToken", response.data.token);
           localStorage.setItem("myimUsername", response.data.username);
+          localStorage.setItem("myimLogo", response.data.logo);
           $this.$router.push("/chat");
         }
       })
@@ -110,9 +111,12 @@ export default {
           if (response.data.iflogin == "yes") {
             $this.$store.dispatch("setAccount", response.data.account);
             $this.$store.dispatch("setToken", response.data.token);
+
             localStorage.setItem("myimToken", response.data.token);
             localStorage.setItem("myimAccount", response.data.account);
             localStorage.setItem("myimUsername", response.data.username);
+            localStorage.setItem("myimLogo", response.data.logo);
+
             $this.$router.push("/chat");
           }
         })
@@ -137,6 +141,7 @@ export default {
             localStorage.setItem("myimAccount", response.data.account);
             localStorage.setItem("myimToken", response.data.token);
             localStorage.setItem("myimUsername", response.data.username);
+            localStorage.setItem("myimLogo", response.data.logo);
           }
         })
         .catch(function () {});

@@ -133,10 +133,12 @@ export default {
           if (response.data.iflogin == "yes") {
             $this.$store.dispatch("setToken", response.data.token);
             $this.$store.dispatch("setAccount", response.data.account);
-            $this.$store.dispatch("setUsername", response.data.username);
+
             localStorage.setItem("myimToken", response.data.token);
             localStorage.setItem("myimAccount", response.data.account);
             localStorage.setItem("myimUsername", response.data.username);
+            localStorage.setItem("myimLogo", response.data.logo);
+
             $this.$router.push("/chat");
           } else {
             $this.tishi = "登录失败，账号或密码错误";
@@ -189,9 +191,12 @@ export default {
           )
           .then(function (response) {
             if (response.data.state) {
+
               localStorage.setItem("myimAccount", response.data.account);
               localStorage.setItem("myimToken", response.data.token);
               localStorage.setItem("myimUsername", response.data.username);
+              localStorage.setItem("myimLogo", response.data.logo);
+              
               $this.tishi = "注册成功，点击下方按钮返回登录";
               $this.changeTab(3);
             } else {

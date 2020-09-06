@@ -1,0 +1,187 @@
+.idialog {
+  position: fixed;
+  width: 600px;
+  height: 400px;
+  background-color: #ffffff;
+  z-index: 3;
+  left: 50%;
+  top: 50%;
+  border-radius: 10px;
+  margin-left: -300px;
+  margin-top: -200px;
+  box-shadow: 0px 0px 1000px 1000px rgba(0, 0, 0, 0.5);
+}
+.idialog::after {
+  position: fixed;
+  width: 100%;
+  height: 100%;
+  content: " ";
+  display: block;
+  left: 0;
+  top: 0;
+  background-color: #bebebe11;
+  z-index: -1;
+}
+
+.dialog_h1 {
+  width: 100%;
+  box-sizing: border-box;
+  border-bottom: 3px solid rgb(165, 165, 165);
+  height: 30px;
+  text-align: left;
+  padding: 0 20px;
+  line-height: 30px;
+  font-size: 15px;
+  background-color: #2d3238;
+  color: #fff;
+}
+.idialog input {
+  text-align: center;
+  position: relative;
+  font-size: 14px;
+  display: inline-block;
+  width: 80%;
+  left: 10%;
+  box-sizing: border-box;
+  line-height: 40px;
+  margin-bottom: 20px;
+  outline: none;
+}
+.label {
+  text-align: right;
+  vertical-align: middle;
+  float: left;
+  font-size: 14px;
+  color: #606266;
+  line-height: 40px;
+  padding: 0 12px 0 0;
+  -webkit-box-sizing: border-box;
+  box-sizing: border-box;
+}
+.idialog .dialog_txt {
+  text-align: left;
+  vertical-align: middle;
+  float: left;
+  font-size: 14px;
+  color: #606266;
+  line-height: 40px;
+  padding: 12px;
+  -webkit-box-sizing: border-box;
+  box-sizing: border-box;
+}
+.dialog_list {
+  max-height: 300px;
+  overflow-y: auto;
+}
+.dialog_list_item {
+  background-color: #ffffff13;
+  padding: 0px 10px;
+  font-size: 10px;
+  text-align: center;
+  margin: 10px;
+  box-shadow: 0 0 100px rgba(0, 0, 0, 0.082);
+}
+.dialog_list_item:hover {
+  background-color: #ffffff;
+}
+
+.idialog .idialog_chose {
+  position: relative;
+  margin: 20px;
+}
+.idialog .dialog_label {
+  text-align: left;
+  vertical-align: middle;
+  font-size: 14px;
+  color: #606266;
+  line-height: 40px;
+  height: 60px;
+  padding: 10px 40px;
+  -webkit-box-sizing: border-box;
+  box-sizing: border-box;
+}
+.idialog_button_group {
+  position: absolute;
+  bottom: 0;
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-end;
+  width: 100%;
+  height: 50px;
+  line-height: 50px;
+}
+
+.idialog button {
+  border-radius: 5px;
+  border: 1px solid rgb(155, 155, 155);
+  margin: auto 0;
+  width: 20%;
+  height: 100%;
+  margin: 0 10px;
+  display: inline;
+  font-size: 20px;
+  outline: none;
+  text-align: center;
+  opacity: 0.8;
+}
+
+.idialog .reject {
+  background-color: #ff999952;
+}
+.idialog .reject:hover {
+  background-color: #fad7d777;
+}
+.idialog .accept {
+  background-color: #cfcfcf63;
+}
+.idialog .accept:hover {
+  background-color: #dddddd80;
+}
+
+.idialog .confirm {
+  background-color: #dadada7a;
+}
+.idialog .confirm:hover {
+  background-color: #f5f5f5a9;
+}
+.idialog .cancel {
+  background-color: #ffd7e3;
+}
+.idialog .cancel:hover {
+  background-color: #fff0f5;
+}
+.have_req {
+  color: #fff;
+  animation: slink 0.5s linear infinite;
+}
+@keyframes slink {
+  0% {
+    color: #fff;
+  }
+  50% {
+    color: rgb(133, 133, 133);
+  }
+  100% {
+    color: #fff;
+  }
+}
+
+@media screen and (max-width: 500px) {
+  .chat_show {
+    flex-direction: column;
+  }
+  .left_tab_under_outer {
+    width: 80vw;
+  }
+  .friend_list {
+    width: 80vw;
+  }
+  .menu_bar {
+    left: -40px;
+    width: 40px;
+  }
+  .left_head {
+    width: calc(100% + 40px);
+    left: -40px;
+  }
+}
