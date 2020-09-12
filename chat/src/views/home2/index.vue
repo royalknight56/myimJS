@@ -4,7 +4,7 @@
  * @Autor: RoyalKnight
  * @Date: 2020-07-13 17:30:56
  * @LastEditors: RoyalKnight
- * @LastEditTime: 2020-09-01 11:15:00
+ * @LastEditTime: 2020-09-06 23:46:47
 --> 
 <template>
   <div class="login">
@@ -22,7 +22,7 @@
             <div class="label">即时通信</div>
             <!-- <input id="account" placeholder="请输入账号" v-model="account" />
             <input type="password" placeholder="请输入密码" id="password" v-model="password" /> -->
-            <button class="primary">访问官网</button>
+            <button @click="tpto()" class="primary">访问官网</button>
             <!-- <button @click="changeTab(1)">新用户注册</button> -->
             <button @click="changeTab(2)">第三方登录</button>
           </div>
@@ -91,6 +91,9 @@ export default {
     };
   },
   methods: {
+    tpto:function(){
+      this.$router.push('/page')
+    },
     changeTab: function (num) {
       this.$refs.tabCon.style.left='-'+450*num+'px'
     },

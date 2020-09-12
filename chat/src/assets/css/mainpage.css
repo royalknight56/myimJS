@@ -1,0 +1,59 @@
+.bgm{
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+  z-index: -1;
+  background-size: cover;
+}
+.bgm img{
+    width: 100%;
+}
+
+.m_h1 {
+  text-align: center;
+  font-size: 40px;
+  padding: 80px;
+  white-space: nowrap;
+}
+.m_logo{
+    width: 100px;
+    top:10px;
+    position: relative;
+    left: 50%;
+    margin-left: -50px;
+
+}
+.m_logo img{
+    width: 100%;
+}
+.m_txt{
+
+    padding: 40px 0;
+    line-height: 40px;
+    position: relative;
+    left: 50%;
+    margin-left: -200px;
+    width: 400px;
+    text-align: center;
+    background-color: rgba(255, 255, 255, 0.603);
+}
+.m_button {
+
+    position: relative;
+    text-align: center;
+    line-height: 50px;
+  border: 1px solid rgba(153, 153, 153, 0.452);
+  border-radius: 4px;
+  width: 200px;
+  height: 50px;
+  background-color: rgba(202, 227, 248, 0.356);
+  left: 50%;
+  transition: all 0.2s;
+  margin: 40px 0 40px -100px;
+}
+.m_button:hover{
+    background-color: rgba(120, 193, 252, 0.815);
+    color: aliceblue;
+}

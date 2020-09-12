@@ -4,7 +4,7 @@
  * @Autor: RoyalKnight
  * @Date: 2020-07-13 16:41:16
  * @LastEditors: RoyalKnight
- * @LastEditTime: 2020-08-31 16:57:24
+ * @LastEditTime: 2020-09-06 22:53:32
  */ 
 import Layout from '@/views/layout'
 
@@ -31,7 +31,7 @@ export default [
             component: () => import( '../views/chat')
           },
           {
-            path: 'center2',
+            path: '/page',
             name: 'center2',
             meta: { title: 'center2', icon: 'deploy' },
             component: () => import( '../views/center2')

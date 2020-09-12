@@ -4,7 +4,7 @@
  * @Autor: RoyalKnight
  * @Date: 2020-07-13 17:30:56
  * @LastEditors: RoyalKnight
- * @LastEditTime: 2020-08-31 22:19:33
+ * @LastEditTime: 2020-09-06 23:48:23
 --> 
 <template>
   <div class="login">
@@ -37,6 +37,7 @@
           <div class="login_register login_tab">
             <div class="label">第三方登录</div>
             <div class="label">暂时无法登录</div>
+            <button @click="tpto()" class="primary">访问官网</button>
             <button @click="changeTab(0)">返回登录</button>
           </div>
           <div class="login_login login_tab">
@@ -102,6 +103,9 @@ export default {
     };
   },
   methods: {
+    tpto:function(){
+      this.$router.push('/page')
+    },
     changeTab: function (num) {
       this.$refs.tabCon.style.left = "-" + 450 * num + "px";
     },
