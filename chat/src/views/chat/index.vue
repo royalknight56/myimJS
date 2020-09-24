@@ -4,7 +4,7 @@
  * @Autor: RoyalKnight
  * @Date: 2020-07-14 10:36:46
  * @LastEditors: RoyalKnight
- * @LastEditTime: 2020-09-06 16:40:31
+ * @LastEditTime: 2020-09-20 14:09:27
 --> 
 <template>
   <div class="chat" :class="ifhidden?'chat_hidden':'chat_show'">
@@ -204,7 +204,7 @@
               <div
                 v-else-if="item.message.type=='txt'"
                 class="message_item_txt"
-              >{{item.message.txt}}</div>
+              >{{item.message.txt | emoji}}</div>
             </div>
           </div>
         </div>
@@ -334,6 +334,9 @@ export default {
     };
   },
   filters: {
+    emoji:function(str){
+      return str
+    },
     linkForm:function(value){
       if(value.length>100){
         return value.slice(0,100)+'...'
@@ -497,7 +500,8 @@ export default {
   methods: {
     sendMessage: function () {
       var $this = this;
-
+      this.typing=this.typing.replace(/\uD83C[\uDF00-\uDFFF]|\uD83D[\uDC00-\uDE4F]/g, "");
+      
       if (
         $this.chosenFriend &&
         $this.chosenFriend != $this.account &&

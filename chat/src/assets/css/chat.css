@@ -261,8 +261,8 @@
 }
 .friend_tab{
     position: relative;
-    background-color: #2d8bf052;
-    backdrop-filter: saturate(180%) blur(20px);
+    background-color: #5eacff;
+
     left: 100%;
     transition: all 0.2s;
     z-index: 2;
@@ -365,6 +365,18 @@
     overflow: hidden;
     position: absolute;
     left: 20px;
+    animation: logoan 5s infinite;
+}
+@keyframes logoan{
+    0%{
+        box-shadow: 1px 1px 10px black;
+    }
+    50%{
+        box-shadow: 1px 1px 32px black;
+    }
+    100%{
+        box-shadow: 1px 1px 10px black;
+    }
 }
 .left_tab_under_outer{
     overflow: hidden;
